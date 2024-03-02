@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    #question {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    #options {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    label {
+      display: flex;
+      justify-items: center;
+      margin-bottom: 10px;
+    }
+    input[type="radio"] {
+      margin-right: 5px;
+    }
+    #result {
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz Game</h1>
+    <div id="loginForm">
+      <button onclick="login()">Start Quiz</button>
+    </div>
+    <div id="quiz" style="display: none;">
+      <div id="question"></div>
+      <form id="options"></form>
+      <div id="result"></div>
+      <button onclick="nextQuestion()">Next</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script>
+   // let currentUser = username;
+    let score = 0;
+    let streak = 0;
+
+    const usersScores = JSON.parse(localStorage.getItem('usersScores')) || {};
+
+    const questions = [
+    {
+    question: "why javascript is client side Scripting language",
+    options: ["provide low level acess", "provide high level acess", "Do not provide low level access", "None of these"],
+    answer: "Do not provide low level access"
+  },
+  {
+    question: "what is call back ?",
+    options: ["A function passed as parameter in another function", "it increase the computation", "it enhance the security", "None of these"],
+    answer: "A function passed as parameter in another function"
+  },
+  {
+    question: "what is the function of api getway in web development?",
+    options: ["Authorization and Authentication", "Request Routing", "Caching", "All of these"],
+    answer: "All of these"
+  },
+  {
+    question: "why javascript is client side Scripting language",
+    options: ["provide low level acess", "provide high level acess", "Do not provide low level access", "None of these"],
+    answer: "Do not provide low level access"
+  },
+  {
+    question: "what is call back ?",
+    options: ["A function passed as parameter in another function", "it increase the computation", "it enhance the security", "None of these"],
+    answer: "A function passed as parameter in another function"
+  },
+  {
+    question: "what is the function of api getway in web development?",
+    options: ["Authorization and Authentication", "Request Routing", "Caching", "All of these"],
+    answer: "All of these"
+  },
+  {
+    question: "why javascript is client side Scripting language",
+    options: ["provide low level acess", "provide high level acess", "Do not provide low level access", "None of these"],
+    answer: "Do not provide low level access"
+  },
+  {
+    question: "what is call back ?",
+    options: ["A function passed as parameter in another function", "it increase the computation", "it enhance the security", "None of these"],
+    answer: "A function passed as parameter in another function"
+  },
+  {
+    question: "what is the function of api getway in web development?",
+    options: ["Authorization and Authentication", "Request Routing", "Caching", "All of these"],
+    answer: "All of these"
+  }
+    ];
+
+    function login() {
+      //const username = document.getElementById('username').value.trim();
+      // if (username === '') {
+      //   alert('Please enter a valid username.');
+      //   return;
+      // }
+      //currentUser = username;
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('quiz').style.display = 'block';
+      loadNextQuestion();
+    }
+
+    function logout() {
+      currentUser = " ";
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('quiz').style.display = 'none';
+      score = 0;
+      streak = 0;
+      
+    }
+
+    function loadNextQuestion() {
+      const question = questions[Math.floor(Math.random() * questions.length)];
+      document.getElementById('question').textContent = question.question;
+
+      const optionsContainer = document.getElementById('options');
+      optionsContainer.innerHTML = '';
+      question.options.forEach((option, index) => {
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'option';
+        input.id = `option${index}`;
+        input.value = option;
+        const label = document.createElement('label');
+        label.htmlFor = `option${index}`;
+        label.textContent = option;
+        optionsContainer.appendChild(input);
+        optionsContainer.appendChild(label);
+      });
+    }
+
+    function checkAnswer(correctAnswer) {
+      const selectedOption = document.querySelector('input[name="option"]:checked');
+      if (!selectedOption) {
+        return; // No option selected
+      }
+      if (selectedOption.value === correctAnswer) {
+        score++;
+        streak++;
+        displayResult("Correct!", "green");
+        if (streak >= 3) {
+          displayMessage("Good Job!");
+        }
+        if (streak >= 5) {
+          displayMessage("Amazing!");
+        }
+      } else {
+        streak = 0;
+        displayResult("Incorrect. The correct answer was: " + correctAnswer, "red");
+      }
+    }
+
+    function displayResult(message, color) {
+      document.getElementById('result').textContent = message;
+      document.getElementById('result').style.color = color;
+    }
+
+    function displayMessage(message) {
+      alert(message);
+    }
+
+    function nextQuestion() {
+      const selectedOption = document.querySelector('input[name="option"]:checked');
+      if (!selectedOption) {
+        alert("Please select an option before moving to the next question.");
+        return;
+      }
+      const currentQuestion = questions.find(q => q.question === document.getElementById('question').textContent);
+      checkAnswer(currentQuestion.answer);
+      if (score >= 10) {
+        displayMessage("Congratulations! You've achieved a high score!");
+      }
+      loadNextQuestion();
+    }
+
+    window.onbeforeunload = function() {
+      if (currentUser) {
+        if (!usersScores[currentUser] || usersScores[currentUser] < score) {
+          usersScores[currentUser] = score;
+          localStorage.setItem('usersScores', JSON.stringify(usersScores));
+        }
+      }
+    };
+  </script>
+</body>
+</html>
